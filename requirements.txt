@@ -1,0 +1,5 @@
+apify-client
+pandas
+python-dotenv
+selenium
+webdriver-manager

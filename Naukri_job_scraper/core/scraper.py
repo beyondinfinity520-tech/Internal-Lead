@@ -1,0 +1,126 @@
+import time
+from selenium import webdriver
+from selenium.webdriver.chrome.service import Service
+from webdriver_manager.chrome import ChromeDriverManager
+from selenium.webdriver.common.by import By
+from selenium.webdriver.support.ui import WebDriverWait
+from selenium.webdriver.support import expected_conditions as EC
+from selenium.common.exceptions import TimeoutException, NoSuchElementException
+
+from models.job import Job, JobCollection
+
+class NaukriScraper:
+    def __init__(self, config):
+        self.config = config
+        options = webdriver.ChromeOptions()
+        options.add_argument("--headless=new")
+        options.add_argument("--window-size=1920,1080")
+        options.add_argument("--disable-gpu")
+        options.add_argument("--no-sandbox")
+        options.add_argument("--disable-dev-shm-usage")
+        options.add_argument("--disable-blink-features=AutomationControlled")
+        options.add_experimental_option("excludeSwitches", ["enable-automation"])
+        options.add_experimental_option('useAutomationExtension', False)
+        options.add_argument(
+            "user-agent=Mozilla/5.0 (Windows NT 10.0; Win64; x64) "
+            "AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36"
+        )
+        self.driver = webdriver.Chrome(service=Service(ChromeDriverManager().install()), options=options)
+
+    def _get_base_url(self):
+        clean_kw = self.config.keywords.strip().lower().replace(" ", "-")
+        if self.config.location.strip():
+            clean_loc = self.config.location.strip().lower().replace(" ", "-")
+            return f"https://www.naukri.com/{clean_kw}-jobs-in-{clean_loc}"
+        return f"https://www.naukri.com/{clean_kw}-jobs"
+
+    def scrape(self):
+        jobs_collection = JobCollection()
+        scraped_urls = set()
+        processed_count = 0
+        page_number = 1
+        base_url = self._get_base_url()
+
+        try:
+            while processed_count < self.config.max_jobs:
+                current_url = base_url if page_number == 1 else f"{base_url}-{page_number}"
+                print(f"\n --- SCANNING PAGE {page_number} ---")
+                self.driver.get(current_url)
+
+                try:
+                    WebDriverWait(self.driver, self.config.wait_time).until(
+                        EC.presence_of_element_located((By.CSS_SELECTOR, ".srp-jobtuple-wrapper"))
+                    )
+                except TimeoutException:
+                    print("Reached end of job listings.")
+                    break
+               
+                for i in range(1, 4):
+                    self.driver.execute_script(f"window.scrollTo(0, {i * 1000});")
+                    time.sleep(1)
+
+                job_cards = self.driver.find_elements(By.CSS_SELECTOR, ".srp-jobtuple-wrapper")
+                job_urls = []
+                for card in job_cards:
+                    try:
+                        title_elem = card.find_element(By.CSS_SELECTOR, "a.title")
+                        job_url = title_elem.get_attribute("href").split('?')[0]
+                        if job_url not in scraped_urls:
+                            company_name = card.find_element(By.CSS_SELECTOR, "a.comp-name").text.strip()
+                            job_title = title_elem.text.strip()
+                            job_urls.append((job_url, company_name, job_title))
+                    except:
+                        continue
+
+                for job_url, company_name, job_title in job_urls:
+                    if processed_count >= self.config.max_jobs:
+                        break
+                    try:
+                        self.driver.execute_script("window.open('');")
+                        self.driver.switch_to.window(self.driver.window_handles[1])
+                        self.driver.get(job_url)
+                        company_website = "N/A"
+                        try:
+                            WebDriverWait(self.driver, 5).until(
+                                EC.presence_of_element_located((By.CSS_SELECTOR, "section.styles_about-company__lOsvW"))
+                            )
+                            company_section = self.driver.find_element(By.CSS_SELECTOR, "section.styles_about-company__lOsvW")
+                            links = company_section.find_elements(By.CSS_SELECTOR, "div.styles_comp-info-detail__sO7Aw a")
+                            for link in links:
+                                href = link.get_attribute("href")
+                                if href and href.startswith("http"):
+                                    company_website = href
+                                    break
+                        except TimeoutException:
+                            company_website = "N/A"
+
+                        job = Job(
+                            title=job_title,
+                            industry=self.config.industry,
+                            company_name=company_name,
+                            job_url=job_url,
+                            company_website=company_website
+                        )
+                        jobs_collection.add_job(job)
+                        scraped_urls.add(job_url)
+                        processed_count += 1
+                        print(f"[{processed_count}] {job.title} | {company_name} | Website: {company_website}")
+
+                        self.driver.close()
+                        self.driver.switch_to.window(self.driver.window_handles[0])
+
+                    except Exception as e:
+                        print(f"Skipping a job due to error: {e}")
+                        self.driver.close()
+                        self.driver.switch_to.window(self.driver.window_handles[0])
+                        continue
+
+                try:
+                    self.driver.find_element(By.CSS_SELECTOR, "a.styles_btn-secondary__2AsIP")
+                    page_number += 1
+                except NoSuchElementException:
+                    break
+
+            return jobs_collection
+        finally:
+            self.driver.quit()

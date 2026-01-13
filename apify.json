@@ -1,0 +1,9 @@
+{
+    "name": "unified-lead-scraper",
+    "version": "1.0",
+    "buildTag": "latest",
+    "env": {
+        "PYTHONUNBUFFERED": "1"
+    },
+    "dockerfile": "./Dockerfile"
+}

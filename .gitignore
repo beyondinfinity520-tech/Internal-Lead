@@ -1,0 +1,37 @@
+# Byte-compiled / optimized / DLL files
+__pycache__/
+*.pyc
+*.pyd
+*.pyo
+*.exe
+*.dll
+
+# Virtual environment
+venv/
+.venv/
+.env/
+
+
+# Editor-specific files
+.vscode/
+.idea/
+
+# OS-specific files
+.DS_Store
+Thumbs.db
+
+# Logs and databases
+*.log
+*.db
+
+# Scraper output files
+output/
+*.csv
+*.json
+*.xlsx
+
+# Configuration files
+config.ini
+
+# Jupyter Notebook checkpoints
+.ipynb_checkpoints/

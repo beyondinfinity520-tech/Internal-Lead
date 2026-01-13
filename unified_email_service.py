@@ -10,7 +10,7 @@ from dotenv import load_dotenv
 load_dotenv()
 
 def send_unified_report(file_paths):
-    sender = os.getenv("LINKEDIN_EMAIL")
+    sender = os.getenv("RECIPIENT_EMAIL")
     password = os.getenv("GMAIL_APP_PASSWORD")
     recipient = os.getenv("RECIPIENT_EMAIL")
 

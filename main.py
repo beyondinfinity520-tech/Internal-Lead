@@ -1,10 +1,15 @@
 import os
+import sys
 from dotenv import load_dotenv
 
 # Import the refactored functions from each scraper module
 from linkedin_jobscraper.main import run_batch as run_linkedin_jobs_batch
 from linkedin_post_scraper.main import run_batch as run_linkedin_posts_batch
 from Naukri_job_scraper.main import run_batch as run_naukri_batch
+
+# Import the email sender actor main function
+# This allows us to run the emailer from this main script based on an env var
+from email_sender_actor.main import main as run_email_sender
 
 load_dotenv()
 
@@ -30,10 +35,9 @@ def get_dataset_client():
         print(f"Could not initialize Apify client: {e}")
         return None
 
-def main():
+def run_scraper():
     """
-    Main function for the Apify Scraper Actor.
-    This function is executed by the Apify platform on each run.
+    Executes the scraping logic for all three scrapers.
     """
     dataset_client = get_dataset_client()
 
@@ -64,6 +68,23 @@ def main():
         dataset_client.push_items(naukri_jobs)
 
     print("\n--- Unified Scraper Run Complete ---")
+
+def main():
+    """
+    Main entry point. Dispatches to Scraper or Emailer based on env var.
+    """
+    # Check for ACTOR_MODE environment variable. Default is 'SCRAPER'.
+    # Set ACTOR_MODE=EMAILER in the Apify Console for the email actor.
+    mode = os.getenv("ACTOR_MODE", "SCRAPER").upper()
+
+    print(f"--- Initializing Actor in {mode} mode ---")
+
+    if mode == "EMAILER":
+        # Run the email sender logic
+        run_email_sender()
+    else:
+        # Run the default scraper logic
+        run_scraper()
 
 if __name__ == "__main__":
     main()

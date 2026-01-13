@@ -1,5 +1,5 @@
 from bs4 import BeautifulSoup
-from models.job import Job
+from ..models.job import Job
 from typing import List
 
 class LinkedInParser:

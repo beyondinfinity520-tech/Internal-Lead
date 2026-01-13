@@ -264,8 +264,8 @@ import json
 from datetime import datetime
 from dotenv import load_dotenv
 
-from config.settings import ScraperConfig
-from core.scraper import LinkedInScraper
+from .config.settings import ScraperConfig
+from .core.scraper import LinkedInScraper
 
 load_dotenv()
 

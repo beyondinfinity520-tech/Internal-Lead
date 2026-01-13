@@ -1,7 +1,7 @@
 import time
 from selenium.webdriver.common.by import By
-from config.settings import ScraperConfig
-from models.post import PostLead, PostCollection
+from ..config.settings import ScraperConfig
+from ..models.post import PostLead, PostCollection
 
 class PostScraper:
     def __init__(self, driver, limit):

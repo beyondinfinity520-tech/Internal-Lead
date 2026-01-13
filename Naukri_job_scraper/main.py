@@ -237,8 +237,8 @@ import json
 from datetime import datetime
 from dotenv import load_dotenv
 
-from config.settings import ScraperConfig
-from core.scraper import NaukriScraper
+from .config.settings import ScraperConfig
+from .core.scraper import NaukriScraper
 
 load_dotenv()
 

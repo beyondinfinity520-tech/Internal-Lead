@@ -176,9 +176,9 @@ from selenium import webdriver
 from selenium.webdriver.chrome.service import Service
 from webdriver_manager.chrome import ChromeDriverManager
 
-from core.auth import LinkedInAuth
-from core.scraper import PostScraper
-from config.settings import ScraperConfig
+from .core.auth import LinkedInAuth
+from .core.scraper import PostScraper
+from .config.settings import ScraperConfig
 
 load_dotenv()
 

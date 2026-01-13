@@ -3,8 +3,8 @@ import time
 from dotenv import load_dotenv
 from selenium.webdriver.common.by import By
 from selenium.webdriver.common.keys import Keys
-from utils.cookies import save_cookies, load_cookies
-from utils.logger import logger
+from ..utils.cookies import save_cookies, load_cookies
+from ..utils.logger import logger
 
 load_dotenv()
 

@@ -11,7 +11,7 @@ from unified_email_service import send_unified_report
 load_dotenv()
 
 # This is the name of the dataset used by the scraper actor
-DATASET_NAME = "internal-leads"
+DATASET_NAME = "internal-lead"
 
 # Define unique columns for deduplication for each source
 UNIQUE_COLS = {
@@ -30,7 +30,13 @@ CSV_COLUMNS = {
 def get_dataset_client():
     try:
         from apify_client import ApifyClient
-        client = ApifyClient(os.getenv("APIFY_API_TOKEN"))
+        
+        token = os.getenv("APIFY_API_TOKEN") or os.getenv("APIFY_TOKEN")
+        if not token:
+            print("CRITICAL: No APIFY_TOKEN found. Cannot access dataset.")
+            return None
+            
+        client = ApifyClient(token)
         return client.dataset(DATASET_NAME)
     except ImportError:
         print("Apify client not installed. Cannot proceed. `pip install apify-client`")

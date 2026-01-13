@@ -25,9 +25,16 @@ def get_dataset_client():
     """
     try:
         from apify_client import ApifyClient
-        client = ApifyClient(os.getenv("APIFY_API_TOKEN"))
-        # Using a named dataset as requested, "internal_lead" -> "internal-leads"
-        return client.dataset("internal-leads").get_or_create()
+        
+        # Check for manually set token OR system provided token (APIFY_TOKEN is default on Apify)
+        token = os.getenv("APIFY_API_TOKEN") or os.getenv("APIFY_TOKEN")
+        if not token:
+            print("CRITICAL: No APIFY_TOKEN found. Cannot connect to Apify Storage.")
+            return None
+            
+        client = ApifyClient(token)
+        # Using the specific named dataset "internal-lead"
+        return client.dataset("internal-lead").get_or_create()
     except ImportError:
         print("Apify client not installed. Skipping data push. `pip install apify-client`")
         return None
@@ -46,26 +53,35 @@ def run_scraper():
     # 1. Run LinkedIn Job Scraper
     print("\n--- Running LinkedIn Job Scraper ---")
     linkedin_jobs = run_linkedin_jobs_batch()
-    if linkedin_jobs and dataset_client:
-        for job in linkedin_jobs: job['source'] = 'linkedin_jobs'
-        print(f"Found {len(linkedin_jobs)} LinkedIn jobs. Pushing to dataset...")
-        dataset_client.push_items(linkedin_jobs)
+    if linkedin_jobs:
+        if dataset_client:
+            for job in linkedin_jobs: job['source'] = 'linkedin_jobs'
+            print(f"Found {len(linkedin_jobs)} LinkedIn jobs. Pushing to dataset...")
+            dataset_client.push_items(linkedin_jobs)
+        else:
+            print(f"WARNING: Scraped {len(linkedin_jobs)} LinkedIn jobs but Dataset Client is missing. Data NOT saved.")
 
     # 2. Run LinkedIn Post Scraper
     print("\n--- Running LinkedIn Post Scraper ---")
     linkedin_posts = run_linkedin_posts_batch()
-    if linkedin_posts and dataset_client:
-        for post in linkedin_posts: post['source'] = 'linkedin_posts'
-        print(f"Found {len(linkedin_posts)} LinkedIn posts. Pushing to dataset...")
-        dataset_client.push_items(linkedin_posts)
+    if linkedin_posts:
+        if dataset_client:
+            for post in linkedin_posts: post['source'] = 'linkedin_posts'
+            print(f"Found {len(linkedin_posts)} LinkedIn posts. Pushing to dataset...")
+            dataset_client.push_items(linkedin_posts)
+        else:
+            print(f"WARNING: Scraped {len(linkedin_posts)} LinkedIn posts but Dataset Client is missing. Data NOT saved.")
 
     # 3. Run Naukri Job Scraper
     print("\n--- Running Naukri Job Scraper ---")
     naukri_jobs = run_naukri_batch()
-    if naukri_jobs and dataset_client:
-        for job in naukri_jobs: job['source'] = 'naukri_jobs'
-        print(f"Found {len(naukri_jobs)} Naukri jobs. Pushing to dataset...")
-        dataset_client.push_items(naukri_jobs)
+    if naukri_jobs:
+        if dataset_client:
+            for job in naukri_jobs: job['source'] = 'naukri_jobs'
+            print(f"Found {len(naukri_jobs)} Naukri jobs. Pushing to dataset...")
+            dataset_client.push_items(naukri_jobs)
+        else:
+            print(f"WARNING: Scraped {len(naukri_jobs)} Naukri jobs but Dataset Client is missing. Data NOT saved.")
 
     print("\n--- Unified Scraper Run Complete ---")
 

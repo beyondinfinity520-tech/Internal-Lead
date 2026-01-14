@@ -23,13 +23,19 @@ class LinkedInAuth:
             driver.get("https://www.linkedin.com")
             driver.add_cookie({"name": "li_at", "value": cookie})
             driver.get("https://www.linkedin.com/feed/")
-            time.sleep(3)
-            if LinkedInAuth.is_logged_in(driver):
-                logger.info("Cookie login successful!")
-                return
-            else:
-                logger.warning("Cookie login failed. Falling back to username/password.")
-
+            try:
+                # Wait for a stable element on the feed page to ensure it's fully loaded
+                WebDriverWait(driver, 15).until(
+                    EC.visibility_of_element_located((By.CSS_SELECTOR, "input.search-global-typeahead__input"))
+                )
+                if LinkedInAuth.is_logged_in(driver):
+                    logger.info("Cookie login successful! Feed page is ready.")
+                    return
+                else:
+                    logger.warning("Cookie login failed after page load. Falling back to username/password.")
+            except Exception:
+                logger.warning("Cookie login failed: Could not verify feed page. Falling back to username/password.")
+ 
         email = os.getenv("LINKEDIN_EMAIL")
         password = os.getenv("LINKEDIN_PASSWORD")
         if not email or not password:

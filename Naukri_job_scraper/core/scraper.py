@@ -23,10 +23,6 @@ class NaukriScraper:
         options.add_argument("--log-level=3")
         options.add_argument("--disable-software-rasterizer")
 
-        proxy_url = os.getenv("PROXY_URL")
-        if proxy_url:
-            options.add_argument(f'--proxy-server={proxy_url}')
-
         options.add_experimental_option("excludeSwitches", ["enable-automation"])
         options.add_experimental_option('useAutomationExtension', False)
         options.add_argument(
@@ -54,6 +50,18 @@ class NaukriScraper:
                 current_url = base_url if page_number == 1 else f"{base_url}-{page_number}"
                 print(f"\n --- SCANNING PAGE {page_number} ---")
                 self.driver.get(current_url)
+
+                try:
+                    wait = WebDriverWait(self.driver, 10)
+                    sort_button = wait.until(EC.element_to_be_clickable((By.ID, "filter-sort")))
+                    if "Date" not in sort_button.text:
+                        sort_button.click()
+                        date_option = wait.until(EC.element_to_be_clickable((By.CSS_SELECTOR, "li[title='Date'] a")))
+                        date_option.click()
+                        time.sleep(3)
+                except Exception:
+                    # If sorting fails or element not found, continue with default sort
+                    pass
 
                 try:
                     WebDriverWait(self.driver, self.config.wait_time).until(

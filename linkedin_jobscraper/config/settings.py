@@ -6,7 +6,7 @@ class ScraperConfig:
     
     keywords: str = "bench sales" 
     location: str = ""
-    industry: str = "Staffing and Recruiting"
+    industry: int = 104
     max_jobs: int = 5       
     max_pages: int = 3       
     max_scrolls: int = 5      

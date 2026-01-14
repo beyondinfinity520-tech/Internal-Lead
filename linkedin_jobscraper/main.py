@@ -291,7 +291,7 @@ def run_batch():
         cfg = ScraperConfig(
             keywords=settings.get("keywords", "bench sales"), 
             location=settings.get("location", "United States"), 
-            max_jobs=settings.get("batch_size", 20)
+            max_jobs=20  # Explicitly set to 20, ignoring stale settings file
         )
         scraper = LinkedInScraper(cfg)
         job_collection = scraper.run()

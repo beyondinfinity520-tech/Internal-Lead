@@ -26,6 +26,8 @@ class LinkedInScraper:
         options.add_argument("--no-sandbox")
         options.add_argument("--disable-dev-shm-usage")
         options.add_argument("--window-size=1920,1080")
+        options.add_argument("--log-level=3")
+        options.add_argument("--disable-software-rasterizer")
 
         options.add_argument(
             "user-agent=Mozilla/5.0 (Windows NT 10.0; Win64; x64) "
@@ -84,7 +86,8 @@ class LinkedInScraper:
 
     def search_jobs(self):
         query = f"{self.config.keywords} {self.config.location}"
-        url = f"https://www.linkedin.com/jobs/search/?keywords={quote(query)}"
+        industry = self.config.industry
+        url = f"https://www.linkedin.com/jobs/search/?keywords={quote(query)}&f_I={industry}"
 
         self.driver.get(url)
         print(f"\n[START] {self.config.keywords}")
@@ -97,6 +100,15 @@ class LinkedInScraper:
             WebDriverWait(self.driver, 15).until(
                 EC.presence_of_element_located((By.CSS_SELECTOR, "li.scaffold-layout__list-item"))
             )
+
+            # Scroll the results list to trigger lazy loading of more jobs
+            try:
+                results_list = self.driver.find_element(By.CSS_SELECTOR, ".jobs-search-results-list")
+                for _ in range(3):
+                    self.driver.execute_script("arguments[0].scrollTop = arguments[0].scrollHeight", results_list)
+                    time.sleep(1)
+            except Exception:
+                pass
 
             cards = self.driver.find_elements(By.CSS_SELECTOR, "li.scaffold-layout__list-item")
 
@@ -183,10 +195,11 @@ class LinkedInScraper:
                     continue
 
             try:
-                self.driver.find_element(
+                next_btn = self.driver.find_element(
                     By.CSS_SELECTOR,
                     "button.jobs-search-pagination__button--next"
-                ).click()
+                )
+                self.driver.execute_script("arguments[0].click();", next_btn)
                 page += 1
                 time.sleep(4)
             except:

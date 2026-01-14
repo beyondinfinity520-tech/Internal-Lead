@@ -9,9 +9,6 @@ from ..utils.logger import logger
 
 load_dotenv()
 
-EMAIL = os.getenv("LINKEDIN_EMAIL")
-PASSWORD = os.getenv("LINKEDIN_PASSWORD")
-
 class LinkedInAuth:
 
     @staticmethod
@@ -20,6 +17,11 @@ class LinkedInAuth:
 
     @staticmethod
     def login(driver):
+        email = os.getenv("LINKEDIN_EMAIL")
+        password = os.getenv("LINKEDIN_PASSWORD")
+        if not email or not password:
+            raise ValueError("LinkedIn credentials (LINKEDIN_EMAIL, LINKEDIN_PASSWORD) not found in environment variables.")
+
         logger.info("Opening LinkedIn...")
         driver.get("https://www.linkedin.com/login")
         
@@ -29,12 +31,12 @@ class LinkedInAuth:
             # Wait for username field to be visible
             username_field = wait.until(EC.visibility_of_element_located((By.ID, "username")))
             username_field.clear()
-            username_field.send_keys(EMAIL)
+            username_field.send_keys(email)
 
             # Wait for password field to be visible
             password_field = wait.until(EC.visibility_of_element_located((By.ID, "password")))
             password_field.clear()
-            password_field.send_keys(PASSWORD + Keys.RETURN)
+            password_field.send_keys(password + Keys.RETURN)
             
             time.sleep(5)
 

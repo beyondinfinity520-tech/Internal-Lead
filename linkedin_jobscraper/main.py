@@ -286,8 +286,10 @@ def run_batch():
     """
     print(f"[{datetime.now().strftime('%H:%M:%S')}] --- Starting LinkedIn Job Scraper Batch ---")
     settings = load_settings()
+    print(f"Settings Loaded: {settings}")
 
     try:
+        print("Initializing Scraper...")
         cfg = ScraperConfig(
             keywords=settings.get("keywords", "bench sales"), 
             location=settings.get("location", "United States"), 

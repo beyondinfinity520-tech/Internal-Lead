@@ -308,7 +308,7 @@ def run_batch():
 
     except Exception as e:
         print(f"An error occurred during the LinkedIn job scraping batch: {e}")
-        return []
+        raise e # Propagate the error to the main orchestrator
 
 if __name__ == "__main__":
     # This can be run for local testing. It will print the results.

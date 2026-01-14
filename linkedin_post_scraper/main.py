@@ -235,7 +235,7 @@ def run_batch():
 
     except Exception as e:
         print(f"An error occurred during the LinkedIn post scraping batch: {e}")
-        return []
+        raise e # Propagate the error to the main orchestrator
     finally:
         if driver:
             driver.quit()

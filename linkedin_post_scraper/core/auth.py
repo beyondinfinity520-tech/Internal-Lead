@@ -64,3 +64,4 @@ class LinkedInAuth:
             logger.info("Login successful")
         except Exception as e:
             logger.error(f"Login failed: {e}")
+            raise e

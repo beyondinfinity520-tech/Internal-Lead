@@ -22,7 +22,7 @@ class LinkedInAuth:
             logger.info("Attempting login with session cookie...")
             # Go to a simple page first to establish domain context reliably
             driver.get("https://www.linkedin.com/robots.txt")
-            driver.add_cookie({"name": "li_at", "value": cookie, "domain": ".linkedin.com"})
+            driver.add_cookie({"name": "li_at", "value": cookie, "domain": "linkedin.com"})
             driver.get("https://www.linkedin.com/feed/")
             try:
                 # Wait for a stable element on the feed page to ensure it's fully loaded

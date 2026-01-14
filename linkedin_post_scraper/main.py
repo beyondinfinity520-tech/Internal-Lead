@@ -214,7 +214,7 @@ def run_batch():
         driver = webdriver.Chrome(service=Service(ChromeDriverManager().install()), options=options)
         config = ScraperConfig()
         
-        LinkedInAuth.login(driver, os.getenv("LINKEDIN_EMAIL"), os.getenv("LINKEDIN_PASSWORD"), config.COOKIE_FILE)
+        LinkedInAuth.login(driver)
         
         scraper = PostScraper(driver, limit=settings.get("batch_size", 20))
         keyword = settings.get("keyword", "hiring bench sales us staffing")

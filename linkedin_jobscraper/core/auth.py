@@ -17,12 +17,25 @@ class LinkedInAuth:
 
     @staticmethod
     def login(driver):
+        cookie = os.getenv("LINKEDIN_COOKIE")
+        if cookie:
+            logger.info("Attempting login with session cookie...")
+            driver.get("https://www.linkedin.com")
+            driver.add_cookie({"name": "li_at", "value": cookie})
+            driver.get("https://www.linkedin.com/feed/")
+            time.sleep(3)
+            if LinkedInAuth.is_logged_in(driver):
+                logger.info("Cookie login successful!")
+                return
+            else:
+                logger.warning("Cookie login failed. Falling back to username/password.")
+
         email = os.getenv("LINKEDIN_EMAIL")
         password = os.getenv("LINKEDIN_PASSWORD")
         if not email or not password:
             raise ValueError("LinkedIn credentials (LINKEDIN_EMAIL, LINKEDIN_PASSWORD) not found in environment variables.")
 
-        logger.info("Opening LinkedIn...")
+        logger.info("Opening LinkedIn for username/password login...")
         driver.get("https://www.linkedin.com/login")
         
         wait = WebDriverWait(driver, 20)

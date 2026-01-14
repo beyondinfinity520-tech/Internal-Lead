@@ -20,22 +20,24 @@ class LinkedInAuth:
         cookie = os.getenv("LINKEDIN_COOKIE")
         if cookie:
             logger.info("Attempting login with session cookie...")
-            # Go to a simple page first to establish domain context reliably
-            driver.get("https://www.linkedin.com/robots.txt")
-            driver.add_cookie({"name": "li_at", "value": cookie, "domain": ".linkedin.com"})
-            driver.get("https://www.linkedin.com/feed/")
+            # Navigate to the base domain to establish context
+            driver.get("https://www.linkedin.com/")
             try:
-                # Wait for a stable element on the feed page to ensure it's fully loaded
+                # Wait for the page to start loading before adding the cookie
+                WebDriverWait(driver, 15).until(EC.title_contains("LinkedIn"))
+                driver.add_cookie({"name": "li_at", "value": cookie, "domain": ".linkedin.com"})
+                # Now that the cookie is set, go to the feed
+                driver.get("https://www.linkedin.com/feed/")
+                
+                # Wait for the feed page to be ready
                 WebDriverWait(driver, 15).until(
                     EC.visibility_of_element_located((By.CSS_SELECTOR, "input.search-global-typeahead__input"))
                 )
                 if LinkedInAuth.is_logged_in(driver):
                     logger.info("Cookie login successful! Feed page is ready.")
                     return
-                else:
-                    logger.warning("Cookie login failed after page load. Falling back to username/password.")
-            except Exception:
-                logger.warning("Cookie login failed: Could not verify feed page. Falling back to username/password.")
+            except Exception as e:
+                logger.warning(f"Cookie login failed: {e}. Could not verify page or set cookie. Falling back to username/password.")
  
         email = os.getenv("LINKEDIN_EMAIL")
         password = os.getenv("LINKEDIN_PASSWORD")

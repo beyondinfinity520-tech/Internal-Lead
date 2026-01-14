@@ -208,6 +208,11 @@ def run_batch():
     options.add_argument("--disable-gpu")
     options.add_argument("--log-level=3")
     options.add_argument("--disable-software-rasterizer")
+
+    proxy_url = os.getenv("PROXY_URL")
+    if proxy_url:
+        print(f"Using proxy: {proxy_url}")
+        options.add_argument(f'--proxy-server={proxy_url}')
     
     driver = None
     try:

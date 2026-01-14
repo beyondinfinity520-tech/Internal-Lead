@@ -5,13 +5,9 @@ from selenium.webdriver.common.by import By
 from selenium.webdriver.common.keys import Keys
 from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
-import logging
+from ..utils.logger import logger
 
 load_dotenv()
-
-# Configure a simple logger for this module
-logger = logging.getLogger(__name__)
-logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')
 
 class LinkedInAuth:
 

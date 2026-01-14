@@ -1,4 +1,5 @@
 import time
+import os
 from selenium import webdriver
 from selenium.webdriver.chrome.service import Service
 from webdriver_manager.chrome import ChromeDriverManager
@@ -21,6 +22,11 @@ class NaukriScraper:
         options.add_argument("--disable-blink-features=AutomationControlled")
         options.add_argument("--log-level=3")
         options.add_argument("--disable-software-rasterizer")
+
+        proxy_url = os.getenv("PROXY_URL")
+        if proxy_url:
+            options.add_argument(f'--proxy-server={proxy_url}')
+
         options.add_experimental_option("excludeSwitches", ["enable-automation"])
         options.add_experimental_option('useAutomationExtension', False)
         options.add_argument(

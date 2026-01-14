@@ -1,5 +1,6 @@
 import time
 from urllib.parse import quote
+import os
 from selenium import webdriver
 from selenium.webdriver.chrome.service import Service
 from webdriver_manager.chrome import ChromeDriverManager
@@ -28,6 +29,10 @@ class LinkedInScraper:
         options.add_argument("--window-size=1920,1080")
         options.add_argument("--log-level=3")
         options.add_argument("--disable-software-rasterizer")
+
+        proxy_url = os.getenv("PROXY_URL")
+        if proxy_url:
+            options.add_argument(f'--proxy-server={proxy_url}')
 
         options.add_argument(
             "user-agent=Mozilla/5.0 (Windows NT 10.0; Win64; x64) "

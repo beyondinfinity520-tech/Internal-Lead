@@ -21,7 +21,7 @@ class LinkedInAuth:
         if cookie:
             logger.info("Attempting login with session cookie...")
             driver.get("https://www.linkedin.com")
-            driver.add_cookie({"name": "li_at", "value": cookie})
+            driver.add_cookie({"name": "li_at", "value": cookie, "domain": ".linkedin.com"})
             driver.get("https://www.linkedin.com/feed/")
             try:
                 # Wait for a stable element on the feed page to ensure it's fully loaded

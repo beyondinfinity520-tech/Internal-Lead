@@ -4,7 +4,6 @@ from dotenv import load_dotenv
 
 # Import the refactored functions from each scraper module
 from linkedin_jobscraper.main import run_batch as run_linkedin_jobs_batch
-from linkedin_post_scraper.main import run_batch as run_linkedin_posts_batch
 from Naukri_job_scraper.main import run_batch as run_naukri_batch
 
 # Import the email sender actor main function
@@ -64,21 +63,7 @@ def run_scraper():
     except Exception as e:
         print(f"CRITICAL FAILURE in LinkedIn Job Scraper: {e}. Continuing to next scraper.")
 
-    # 2. Run LinkedIn Post Scraper
-    print("\n--- Running LinkedIn Post Scraper ---")
-    try:
-        linkedin_posts = run_linkedin_posts_batch()
-        if linkedin_posts:
-            if dataset_client:
-                for post in linkedin_posts: post['source'] = 'linkedin_posts'
-                print(f"Found {len(linkedin_posts)} LinkedIn posts. Pushing to dataset...")
-                dataset_client.push_items(linkedin_posts)
-            else:
-                print(f"WARNING: Scraped {len(linkedin_posts)} LinkedIn posts but Dataset Client is missing. Data NOT saved.")
-    except Exception as e:
-        print(f"CRITICAL FAILURE in LinkedIn Post Scraper: {e}. Continuing to next scraper.")
-
-    # 3. Run Naukri Job Scraper
+    # 2. Run Naukri Job Scraper
     print("\n--- Running Naukri Job Scraper ---")
     try:
         naukri_jobs = run_naukri_batch()

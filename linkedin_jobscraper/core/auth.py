@@ -65,13 +65,7 @@ class LinkedInAuth:
             if LinkedInAuth.is_logged_in(driver):
                 logger.info("Login successful")
             else:
-                current_url = driver.current_url
-                error_msg = f"LinkedIn login failed. Expected 'feed' in URL, but was on: {current_url}."
-                if "checkpoint" in current_url or "challenge" in current_url:
-                    error_msg += " This may be a security check (CAPTCHA)."
-                elif "login" in current_url:
-                    error_msg += " Page did not redirect, check credentials."
-                raise Exception(error_msg)
+                raise Exception("LinkedIn login failed")
         except Exception as e:
             logger.error(f"Login failed: {e}")
             raise e

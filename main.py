@@ -33,7 +33,8 @@ def get_dataset_client():
             
         client = ApifyClient(token)
         # Using the specific named dataset "internal-lead"
-        return client.datasets().get_or_create(name="internal-lead")
+        dataset_info = client.datasets().get_or_create(name="internal-lead")
+        return client.dataset(dataset_info['id'])
     except ImportError:
         print("Apify client not installed. Skipping data push. `pip install apify-client`")
         return None

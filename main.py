@@ -3,7 +3,7 @@ import sys
 from dotenv import load_dotenv
 
 # Import the refactored functions from each scraper module
-from linkedin_jobscraper.main import run_batch as run_linkedin_jobs_batch
+from linkedin_scraper.main import scrape_linkedin_jobs
 from Naukri_job_scraper.main import run_batch as run_naukri_batch
 
 # Import the email sender actor main function
@@ -53,7 +53,14 @@ def run_scraper():
     # 1. Run LinkedIn Job Scraper
     print("\n--- Running LinkedIn Job Scraper ---")
     try:
-        linkedin_jobs = run_linkedin_jobs_batch()
+        # Configuration for the new scraper
+        linkedin_config = {
+            "keywords": "bench sales, bdm",
+            "location": "",
+            "maxJobs": 20
+        }
+        linkedin_jobs = scrape_linkedin_jobs(linkedin_config)
+        
         if linkedin_jobs:
             if dataset_client:
                 for job in linkedin_jobs: job['source'] = 'linkedin_jobs'

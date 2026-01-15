@@ -1,5 +1,9 @@
-apify-client
+beautifulsoup4
+requests
+lxml
+urllib3
 pandas
 python-dotenv
+apify-client
 selenium
 webdriver-manager

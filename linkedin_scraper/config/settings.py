@@ -3,7 +3,7 @@ class ScraperConfig:
     
     def __init__(
         self,
-        keywords: str = "bench sales, bdm",
+        keywords: str = "bench sales bdm",
         location: str = "",
         max_jobs: int = 50,
         skills: str = "",

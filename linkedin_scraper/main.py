@@ -87,7 +87,7 @@ def main():
     except FileNotFoundError:
         logger.warning("user_details.json not found, using default configuration")
         config_data = {
-            "keywords": "bench sales, bdm",
+            "keywords": "bench sales bdm",
             "location": "",
             "maxJobs": 50,
             "skills": "",

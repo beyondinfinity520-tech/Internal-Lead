@@ -37,7 +37,8 @@ def get_dataset_client():
             return None
             
         client = ApifyClient(token)
-        return client.dataset(DATASET_NAME)
+        dataset_info = client.datasets().get_or_create(name=DATASET_NAME)
+        return client.dataset(dataset_info['id'])
     except ImportError:
         print("Apify client not installed. Cannot proceed. `pip install apify-client`")
         return None

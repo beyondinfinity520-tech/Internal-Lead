@@ -35,7 +35,7 @@ DATA_SOURCE = "LinkedIn"
 
 # Default Values
 DEFAULT_MAX_JOBS = 50
-DEFAULT_KEYWORDS = "bench sales, bdm"
+DEFAULT_KEYWORDS = "bench sales bdm"
 DEFAULT_LOCATION = ""
 
 # Output Configuration

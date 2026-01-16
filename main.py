@@ -55,7 +55,7 @@ def run_scraper():
     try:
         # Configuration for the new scraper
         linkedin_config = {
-            "keywords": "bench sales, bdm",
+            "keywords": "bench sales bdm",
             "location": "",
             "maxJobs": 20
         }

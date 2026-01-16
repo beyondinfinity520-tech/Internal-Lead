@@ -55,13 +55,16 @@ class LinkedInScraper:
             "Sec-Fetch-Site": "same-origin",
             "Sec-Fetch-User": "?1",
             "Referer": "https://www.linkedin.com/",
+            "Sec-Ch-Ua": '"Not/A)Brand";v="8", "Chromium";v="126", "Google Chrome";v="126"',
+            "Sec-Ch-Ua-Mobile": "?0",
+            "Sec-Ch-Ua-Platform": '"Windows"',
         })
         
         return session
     
     def _build_search_url(self, start: int = 0) -> str:
         """Build LinkedIn search URL with parameters."""
-        base_url = f"{LINKEDIN_JOBS_BASE_URL}?keywords={self.config.search_query}&f_l=104"
+        base_url = f"{LINKEDIN_JOBS_BASE_URL}?keywords={self.config.search_query}"
         base_url += f"&location={self.config.location_query}"
         base_url += f"&start={start}"
         
@@ -124,6 +127,11 @@ class LinkedInScraper:
             response = self.session.get(url, timeout=REQUEST_TIMEOUT)
             response.raise_for_status()
             
+            # Check if redirected to login or authwall
+            if "login" in response.url or "authwall" in response.url or "challenge" in response.url:
+                logger.warning(f"LinkedIn redirected to auth page: {response.url}")
+                return None
+
             logger.debug(f"Successfully fetched URL: {url}")
             return response.text
             

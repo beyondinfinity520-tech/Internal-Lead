@@ -253,8 +253,8 @@ def load_settings():
     # Default settings if file is missing or corrupt
     return {
         "batch_size": 20, 
-        "keywords": "bench sales recruiter",
-        "location": "remote"
+        "keywords": "bench sales",
+        "location": ""
     }
 
 def run_batch():
@@ -267,7 +267,7 @@ def run_batch():
     try:
         config = ScraperConfig()
         config.keywords = settings.get("keywords", "bench sales")
-        config.location = settings.get("location", "remote")
+        config.location = settings.get("location", "")
         config.max_jobs = settings.get("batch_size", 20)
         
         scraper = NaukriScraper(config)

@@ -1,5 +1,6 @@
 import time
 import os
+import urllib.parse
 from selenium import webdriver
 from selenium.webdriver.chrome.service import Service
 from webdriver_manager.chrome import ChromeDriverManager
@@ -31,24 +32,39 @@ class NaukriScraper:
         )
         self.driver = webdriver.Chrome(service=Service(ChromeDriverManager().install()), options=options)
 
-    def _get_base_url(self):
-        clean_kw = self.config.keywords.strip().lower().replace(" ", "-")
-        if self.config.location.strip():
-            clean_loc = self.config.location.strip().lower().replace(" ", "-")
-            return f"https://www.naukri.com/{clean_kw}-jobs-in-{clean_loc}"
-        return f"https://www.naukri.com/{clean_kw}-jobs"
+    def _build_search_url(self, page_number):
+        keyword = self.config.keywords.strip()
+        location = self.config.location.strip()
+        
+        clean_kw = keyword.lower().replace(" ", "-")
+        encoded_kw = urllib.parse.quote(keyword)
+        params = [f"k={encoded_kw}"]
+        params.append("industryTypeIdGid=127")
+
+        if location:
+            clean_loc = location.lower().replace(" ", "-")
+            encoded_loc = urllib.parse.quote(location)
+            base_url = f"https://www.naukri.com/{clean_kw}-jobs"
+            params.append(f"l={encoded_loc}")
+        else:
+            base_url = f"https://www.naukri.com/{clean_kw}-jobs"
+
+        if page_number > 1:
+            base_url = f"{base_url}-{page_number}"
+            
+        return f"{base_url}?{'&'.join(params)}"
 
     def scrape(self):
         jobs_collection = JobCollection()
         scraped_urls = set()
         processed_count = 0
         page_number = 1
-        base_url = self._get_base_url()
 
         try:
             while processed_count < self.config.max_jobs:
-                current_url = base_url if page_number == 1 else f"{base_url}-{page_number}"
+                current_url = self._build_search_url(page_number)
                 print(f"\n --- SCANNING PAGE {page_number} ---")
+                print(f"Scraping URL: {current_url}")
                 self.driver.get(current_url)
 
                 try:

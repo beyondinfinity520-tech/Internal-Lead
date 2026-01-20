@@ -2,7 +2,7 @@ from dataclasses import dataclass
 
 @dataclass
 class ScraperConfig:
-    keywords: str = "bench sales recruiter"
+    keywords: str = "bench sales"
     location: str = "" 
     industry: str = "Staffing and Recruiting"
     

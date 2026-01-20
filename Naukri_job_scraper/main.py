@@ -266,7 +266,7 @@ def run_batch():
     
     try:
         config = ScraperConfig()
-        config.keywords = settings.get("keywords", "bench sales recruiter")
+        config.keywords = settings.get("keywords", "bench sales")
         config.location = settings.get("location", "remote")
         config.max_jobs = settings.get("batch_size", 20)
         

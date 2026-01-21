@@ -1,5 +1,6 @@
 import time
 import os
+import json
 import urllib.parse
 from selenium import webdriver
 from selenium.webdriver.chrome.service import Service
@@ -32,6 +33,22 @@ class NaukriScraper:
         )
         self.driver = webdriver.Chrome(service=Service(ChromeDriverManager().install()), options=options)
 
+    def _load_cursor(self):
+        try:
+            if os.path.exists("naukri_cursor.json"):
+                with open("naukri_cursor.json", "r") as f:
+                    return int(json.load(f).get("last_page", 1))
+        except:
+            pass
+        return 1
+
+    def _save_cursor(self, page):
+        try:
+            with open("naukri_cursor.json", "w") as f:
+                json.dump({"last_page": page}, f)
+        except Exception as e:
+            print(f"Failed to save cursor: {e}")
+
     def _build_search_url(self, page_number):
         keyword = self.config.keywords.strip()
         location = self.config.location.strip()
@@ -58,7 +75,11 @@ class NaukriScraper:
         jobs_collection = JobCollection()
         scraped_urls = set()
         processed_count = 0
+        
+        deep_cursor = self._load_cursor()
+        print(f"Resuming deep scrape from page: {deep_cursor} (after checking Page 1)")
         page_number = 1
+        in_deep_phase = (deep_cursor == 1)
 
         try:
             while processed_count < self.config.max_jobs:
@@ -85,6 +106,8 @@ class NaukriScraper:
                     )
                 except TimeoutException:
                     print("Reached end of job listings.")
+                    if in_deep_phase:
+                        self._save_cursor(1)
                     break
                
                 for i in range(1, 4):
@@ -149,8 +172,17 @@ class NaukriScraper:
 
                 try:
                     self.driver.find_element(By.CSS_SELECTOR, "a.styles_btn-secondary__2AsIP")
-                    page_number += 1
+                    
+                    if page_number == 1 and not in_deep_phase:
+                        page_number = deep_cursor + 1
+                        in_deep_phase = True
+                        print(f"--- Jumping to Page {page_number} to continue previous session ---")
+                    else:
+                        self._save_cursor(page_number)
+                        page_number += 1
+                        
                 except NoSuchElementException:
+                    self._save_cursor(1)
                     break
 
             return jobs_collection

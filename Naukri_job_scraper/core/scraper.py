@@ -16,7 +16,7 @@ class NaukriScraper:
     def __init__(self, config):
         self.config = config
         options = webdriver.ChromeOptions()
-        options.add_argument("--headless=new")
+        #options.add_argument("--headless=new")
         options.add_argument("--window-size=1920,1080")
         options.add_argument("--disable-gpu")
         options.add_argument("--no-sandbox")
@@ -91,9 +91,9 @@ class NaukriScraper:
                 try:
                     wait = WebDriverWait(self.driver, 10)
                     sort_button = wait.until(EC.element_to_be_clickable((By.ID, "filter-sort")))
-                    if "Date" not in sort_button.text:
+                    if "Relevance" not in sort_button.text:
                         sort_button.click()
-                        date_option = wait.until(EC.element_to_be_clickable((By.CSS_SELECTOR, "li[title='Date'] a")))
+                        date_option = wait.until(EC.element_to_be_clickable((By.CSS_SELECTOR, "li[title='Relevance'] a")))
                         date_option.click()
                         time.sleep(3)
                 except Exception:
